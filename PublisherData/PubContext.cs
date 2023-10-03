@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PublisherDomain;
 using System.Reflection.Emit;
 
@@ -10,17 +11,18 @@ namespace PublisherData
         public DbSet<Book> Books { get; set; }
         public DbSet<Artist> Artists { get; set; }
         public DbSet<Cover> Covers { get; set; }
+        public DbSet<AuthorByArtist> AuthorsByArtist { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=PubDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False")
-                          ;
+            optionsBuilder.UseSqlServer($"Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=PubDatabase;Integrated Security=True;" +
+                $"Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False")
+                .LogTo(Console.WriteLine, new[] {DbLoggerCategory.Database.Command.Name}, LogLevel.Information );
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<ArtistCover>().HasKey(e => new { e.ArtistId, e.CoverId });
-
-            SeedData(modelBuilder);
+            modelBuilder.Entity<AuthorByArtist>().HasNoKey().ToView(nameof(AuthorsByArtist));
 
             base.OnModelCreating(modelBuilder);
         }

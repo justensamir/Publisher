@@ -12,5 +12,7 @@ namespace PublisherDomain
         public bool DigitalOnly { get; set; }
         public string DesignIdea { get; set; }
         public List<Artist> Artists { get; set; } = new List<Artist>();
+        public int BookId { get; set; }
+        public Book Book { get; set; }
     }
 }

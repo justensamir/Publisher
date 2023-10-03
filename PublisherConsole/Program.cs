@@ -10,11 +10,77 @@ namespace PublisherConsole
     {
         static void Main(string[] args)
         {
-            //SortAscending();
-            Console.WriteLine("------------------------------------------");
-            //SortDescending();
-            RetriveDataFromArtist();
+            UseSQLRow();
+            UseSQLInterpolation();
+        }
 
+        static void DeleteCoverProcedureUsingSQLRaw(int coverId)
+        {
+            using var context = new PubContext();
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+            
+            int rowCount = context.Database.ExecuteSqlRaw("DeleteCover {0}", coverId);
+            
+            stopwatch.Stop();
+            Console.WriteLine($"Execute SQLRaw Time: {stopwatch.ElapsedMilliseconds}ms");
+
+            Console.WriteLine($"\naffected rows ({rowCount})");
+        }
+
+        static void DeleteCoverProcedureUsingSQLInterpolated(int coverId)
+        {
+            using var context = new PubContext();
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+
+            int rowCount = context.Database.ExecuteSqlInterpolated($"DeleteCover {coverId}");
+
+            stopwatch.Stop();
+            Console.WriteLine($"Execute SQLInterpolated Time: {stopwatch.ElapsedMilliseconds}ms");
+            Console.WriteLine($"\naffected rows ({rowCount})");
+        }
+
+        static void GetDataFromView()
+        {
+            using var context = new PubContext();
+            var artistsAndAuthors = context.AuthorsByArtist.ToList();
+            artistsAndAuthors.ForEach(artist =>
+            {
+                Console.WriteLine(artist);
+            });
+        }
+       
+        static void UseSQLRow()
+        {
+            using var context = new PubContext();
+            Stopwatch stopwatch = new ();
+            stopwatch.Start();
+            var artists = context.Artists.FromSqlRaw("AuthorPublishedYearRange {0},{1}",2005,2020).ToList();
+            stopwatch.Stop();
+
+            Console.WriteLine($"\nSQL Raw Time: {stopwatch.ElapsedMilliseconds}ms\n");
+            artists.ForEach(artist =>
+            {
+                Console.WriteLine(artist);
+            });
+            Console.WriteLine();
+        }
+
+        static void UseSQLInterpolation()
+        {
+            using var context = new PubContext();
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var artists = context.Artists.FromSqlInterpolated($"AuthorPublishedYearRange {2005},{2020}").ToList();
+            stopwatch.Stop();
+            Console.WriteLine($"\nSQL Interpolated Time: {stopwatch.ElapsedMilliseconds}ms\n");
+
+            artists.ForEach(artist =>
+            {
+                Console.WriteLine(artist);
+            });
+            Console.WriteLine();
         }
 
         static void RetriveDataFromArtist()
@@ -140,7 +206,6 @@ namespace PublisherConsole
                 Console.WriteLine($"{author.FirstName} {author.LastName} {author.Id}");
             }
         }
-
 
     }
 }

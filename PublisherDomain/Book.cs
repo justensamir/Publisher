@@ -15,5 +15,6 @@ namespace PublisherDomain
         public decimal BasePrice { get; set; }
         public int? AuthorId { get; set; }
         public Author? Author { get; set; }
+        public Cover? Cover { get; set; }
     }
 }

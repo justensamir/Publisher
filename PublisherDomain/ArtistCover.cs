@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace PublisherDomain
 {
-    public class ArtistCover
+    public class AuthorByArtist
     {
-        //public int ArtistId { get; set; }
-        //public int CoverId { get; set; }
-        //public Artist? Artist { get; set; }
-        //public Cover? Cover { get; set; }
+        public string Artist { get; set; }
+        public string? Author { get; set; }
+        public override string ToString()
+        {
+            return $"Artist: {Artist}, Author: {Author}";
+        }
     }
 }

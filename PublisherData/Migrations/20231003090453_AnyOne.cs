@@ -38,20 +38,6 @@ namespace PublisherData.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Covers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DigitalOnly = table.Column<bool>(type: "bit", nullable: false),
-                    DesignIdea = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Covers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Books",
                 columns: table => new
                 {
@@ -70,6 +56,27 @@ namespace PublisherData.Migrations
                         column: x => x.AuthorId,
                         principalTable: "Authors",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Covers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DigitalOnly = table.Column<bool>(type: "bit", nullable: false),
+                    DesignIdea = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BookId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Covers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Covers_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -96,40 +103,21 @@ namespace PublisherData.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Artists",
-                columns: new[] { "Id", "FirstName", "LastName" },
-                values: new object[,]
-                {
-                    { 1, "Mohamed", "Samir" },
-                    { 2, "Amr", "Elsyliny" },
-                    { 3, "Mustafa", "El Khouly" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Covers",
-                columns: new[] { "Id", "DesignIdea", "DigitalOnly" },
-                values: new object[,]
-                {
-                    { 1, "Ya b3eed", true },
-                    { 2, "Ya wa74ny", false },
-                    { 3, "Ya 3yoon", true }
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_ArtistCover_CoversId",
                 table: "ArtistCover",
                 column: "CoversId");
-            
-            migrationBuilder.CreateIndex(
-                name: "IX_ArtistCover_ArtistsId",
-                table: "ArtistCover",
-                column: "ArtistsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Books_AuthorId",
                 table: "Books",
                 column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Covers_BookId",
+                table: "Covers",
+                column: "BookId",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -138,13 +126,13 @@ namespace PublisherData.Migrations
                 name: "ArtistCover");
 
             migrationBuilder.DropTable(
-                name: "Books");
-
-            migrationBuilder.DropTable(
                 name: "Artists");
 
             migrationBuilder.DropTable(
                 name: "Covers");
+
+            migrationBuilder.DropTable(
+                name: "Books");
 
             migrationBuilder.DropTable(
                 name: "Authors");
